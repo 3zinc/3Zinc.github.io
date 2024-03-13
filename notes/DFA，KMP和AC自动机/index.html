@@ -1,0 +1,1349 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://3zinc.github.io/notes/DFA%EF%BC%8CKMP%E5%92%8CAC%E8%87%AA%E5%8A%A8%E6%9C%BA/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../%E5%9F%BA%E6%9C%AC%E4%B8%8D%E7%AD%89%E5%BC%8F/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.13">
+    
+    
+      
+        <title>DFA，KMP和AC自动机 - Notes :: 3Zinc</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e359304.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dfa" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href=".." title="Notes :: 3Zinc" class="md-header__button md-logo" aria-label="Notes :: 3Zinc" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.89 3 1.96.4L11.11 21l-1.96-.4L12.89 3m6.7 9L16 8.41V5.58L22.42 12 16 18.41v-2.83L19.59 12M1.58 12 8 5.58v2.83L4.41 12 8 15.58v2.83L1.58 12Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Notes :: 3Zinc
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              DFA，KMP和AC自动机
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C9.76 2 7.78 3.05 6.5 4.68l9.81 9.82C17.94 13.21 19 11.24 19 9a7 7 0 0 0-7-7M3.28 4 2 5.27 5.04 8.3C5 8.53 5 8.76 5 9c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h5.73l4 4L20 20.72 3.28 4M9 20v1a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  你好
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  信息技术
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../%E5%9F%BA%E6%9C%AC%E4%B8%8D%E7%AD%89%E5%BC%8F/" class="md-tabs__link">
+          
+  
+  数学
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../%E5%85%AC%E5%BC%8F/" class="md-tabs__link">
+          
+  
+  科学
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Notes :: 3Zinc" class="md-nav__button md-logo" aria-label="Notes :: 3Zinc" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.89 3 1.96.4L11.11 21l-1.96-.4L12.89 3m6.7 9L16 8.41V5.58L22.42 12 16 18.41v-2.83L19.59 12M1.58 12 8 5.58v2.83L4.41 12 8 15.58v2.83L1.58 12Z"/></svg>
+
+    </a>
+    Notes :: 3Zinc
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    你好
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            你好
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    简介
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    信息技术
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            信息技术
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    DFA，KMP和AC自动机
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    DFA，KMP和AC自动机
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dfa" class="md-nav__link">
+    <span class="md-ellipsis">
+      DFA：确定有限状态自动机
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DFA：确定有限状态自动机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dfa_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      DFA 的构成
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dfa_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      DFA 的尝试构造
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dfa-kmp" class="md-nav__link">
+    <span class="md-ellipsis">
+      从 DFA 的角度看看 KMP
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="从 DFA 的角度看看 KMP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#right" class="md-nav__link">
+    <span class="md-ellipsis">
+      Right 集合
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fail" class="md-nav__link">
+    <span class="md-ellipsis">
+      fail 指针
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      总结 &amp; 代码 &amp; 复杂度分析
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kmp-ac" class="md-nav__link">
+    <span class="md-ellipsis">
+      KMP 的进化：AC 自动机
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KMP 的进化：AC 自动机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      简单的介绍和对比
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kmp" class="md-nav__link">
+    <span class="md-ellipsis">
+      数学建模，套用 KMP 的思想
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      代码 &amp; 复杂度分析
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    数学
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            数学
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E5%9F%BA%E6%9C%AC%E4%B8%8D%E7%AD%89%E5%BC%8F/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    基本不等式
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    初等数论
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            初等数论
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E9%80%86%E5%85%83/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    逆元
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E9%9B%86%E5%90%88/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    集合
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E7%BB%84%E5%90%88%E6%95%B0/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    组合数
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E9%B8%BD%E5%B7%A2%E5%8E%9F%E7%90%86/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    鸽巢原理
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    科学
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            科学
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E5%85%AC%E5%BC%8F/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    公式
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dfa" class="md-nav__link">
+    <span class="md-ellipsis">
+      DFA：确定有限状态自动机
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DFA：确定有限状态自动机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dfa_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      DFA 的构成
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dfa_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      DFA 的尝试构造
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dfa-kmp" class="md-nav__link">
+    <span class="md-ellipsis">
+      从 DFA 的角度看看 KMP
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="从 DFA 的角度看看 KMP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#right" class="md-nav__link">
+    <span class="md-ellipsis">
+      Right 集合
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fail" class="md-nav__link">
+    <span class="md-ellipsis">
+      fail 指针
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      总结 &amp; 代码 &amp; 复杂度分析
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kmp-ac" class="md-nav__link">
+    <span class="md-ellipsis">
+      KMP 的进化：AC 自动机
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KMP 的进化：AC 自动机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      简单的介绍和对比
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kmp" class="md-nav__link">
+    <span class="md-ellipsis">
+      数学建模，套用 KMP 的思想
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      代码 &amp; 复杂度分析
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>DFA，KMP和AC自动机</h1>
+
+<h2 id="dfa">DFA：确定有限状态自动机<a class="headerlink" href="#dfa" title="Permanent link">&para;</a></h2>
+<p>确定有限状态自动机（DFA，Deterministic Finite Automation），能够按顺序接受一个信号序列并判断其是否符合 DFA 所要判断的条件。</p>
+<p>放在 OI 里来说，DFA 一般指：依次输入字符，每输入一次字符就进行一次转移，表示当前字符串从某个状态变到另一个状态，输入完所有字符后，即可直接判断是否符合条件。</p>
+<h3 id="dfa_1">DFA 的构成<a class="headerlink" href="#dfa_1" title="Permanent link">&para;</a></h3>
+<p>将所有状态抽象成点后，把转移当做边，就可以将一个 DFA 看做一张有向图来进行处理。这张有向图中应该有这五部分：</p>
+<ol>
+<li>
+<p><span class="arithmatex">\(Q\)</span>，状态集。<span class="arithmatex">\(Q\)</span> 中应有该字符串处理时可能存在的所有状态（点）。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(\Sigma\)</span>，字符集。<span class="arithmatex">\(\Sigma\)</span> 中有且仅有所有可能的（合法的）输入字符。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(q_0\)</span>，起始状态。表示在还未输入时自动机所处的状态（点）。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(F\)</span>，终点集合。<span class="arithmatex">\(F\)</span> 包含所有可接受的（符合条件的）状态（点）。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(\delta\)</span>，转移函数。假设当前处于自动机中的状态（点）<span class="arithmatex">\(q \in Q\)</span>，输入了字符 <span class="arithmatex">\(c \in \Sigma\)</span>，那么转移后的状态（点）<span class="arithmatex">\(q'=\delta(q,c)\)</span>，并且 <span class="arithmatex">\(q' \in Q\)</span>。简洁的来说，<span class="arithmatex">\(\delta\)</span> 建立了每个状态（点）间关系，或者说边。设计 <span class="arithmatex">\(\delta\)</span> 是整个程序中最重要的部分。</p>
+</li>
+</ol>
+<p>接下来，我们再重新描述一下 DFA 怎么工作：</p>
+<ol>
+<li>
+<p>一开始，当前状态（点）<span class="arithmatex">\(q=q_0\)</span>。</p>
+</li>
+<li>
+<p>现在，每输入一个字符 <span class="arithmatex">\(c \in \Sigma\)</span>，于是 <span class="arithmatex">\(q \to \delta(q,c)\)</span> 并且始终 <span class="arithmatex">\(q \in Q\)</span>。</p>
+</li>
+<li>
+<p>输入完字符串，如果 <span class="arithmatex">\(q \in F\)</span>，于是这个字符串是可接受的。不然就不是。</p>
+</li>
+</ol>
+<h3 id="dfa_2">DFA 的尝试构造<a class="headerlink" href="#dfa_2" title="Permanent link">&para;</a></h3>
+<p>让我们浅尝一下：构造一个 DFA，输入一个二进制串并使它能够判断这个二进制串所对应的数是否偶数。首先，依旧是分五步：<span class="arithmatex">\(Q,\Sigma,q_0,F,\delta\)</span>。</p>
+<p>考虑，判断二进制串是否为偶数，只需看最后一位是否为 <span class="arithmatex">\(0\)</span>。</p>
+<ol>
+<li>
+<p><span class="arithmatex">\(Q=\left\{a_0,a_1\right\}\)</span>，这是自动机中的两个状态，<span class="arithmatex">\(a_0\)</span> 表示当前字符串最后一位为 <span class="arithmatex">\(0\)</span>，<span class="arithmatex">\(a_1\)</span> 表示最后一位为 <span class="arithmatex">\(1\)</span>。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(\Sigma=\left\{0,1\right\}\)</span>，二进制串只有这两个字符。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(q_0=a_0\)</span>，当然 <span class="arithmatex">\(q_0=a_1\)</span> 也行。为什么？</p>
+</li>
+<li>
+<p><span class="arithmatex">\(F=\left\{a_0\right\}\)</span>，表示如果最终停在 <span class="arithmatex">\(a_0\)</span>，说明是偶数，可接受。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(\delta\)</span>：<span class="arithmatex">\(\delta(q,0)=a_0,\delta(q,1)=a_1\)</span>。</p>
+</li>
+</ol>
+<p>直观一些：</p>
+<p><img alt="" src="../images/DFA1.png" /></p>
+<p>其中红点表示 <span class="arithmatex">\(F\)</span> 中的点，黑点表示非 <span class="arithmatex">\(F\)</span> 中的点，边上的数表示转移时所输入的字符。</p>
+<h2 id="dfa-kmp">从 DFA 的角度看看 KMP<a class="headerlink" href="#dfa-kmp" title="Permanent link">&para;</a></h2>
+<p>KMP（Knuth Morris Pratt algorithm，用三个提出者的名字命名），可以检测模式串在匹配串中出现了几次。如果我们从 DFA 的角度考虑：接受一个字符串，当且仅当已知的模式串是该字符串的后缀。</p>
+<p>在这里，我定义<strong>模式串</strong>为 <span class="arithmatex">\(S\)</span>，<strong>被匹配串</strong>为 <span class="arithmatex">\(T\)</span>。</p>
+<p>注意，<span class="arithmatex">\(S\)</span> 是已知的、不会变动的，我们将对它构造一个 DFA；而 <span class="arithmatex">\(T\)</span> 则相当于输入的信号串，我们将使用构造出的 DFA 来检测 <span class="arithmatex">\(S\)</span> 是否是它的后缀。</p>
+<p>定义 <span class="arithmatex">\(|S|\)</span> 表示 <span class="arithmatex">\(S\)</span> 的长度（<span class="arithmatex">\(|T|\)</span> 同理）。<strong>所有字符串下标从 <span class="arithmatex">\(1\)</span> 开始。</strong></p>
+<h3 id="right">Right 集合<a class="headerlink" href="#right" title="Permanent link">&para;</a></h3>
+<p>举一个例子：当我们拥有 <span class="arithmatex">\(S=\texttt{moo}\)</span>，且此时 <span class="arithmatex">\(T=\texttt{mmo}\)</span>，那么我们可以发现，如果 <span class="arithmatex">\(T\)</span> 后面在输入一个 <span class="arithmatex">\(\texttt{o}\)</span>，那么就可以满足 KMP 的条件（<span class="arithmatex">\(S\)</span> 是 <span class="arithmatex">\(T\)</span> 的后缀）。</p>
+<p>你是怎么得出来的？很显然，由于 <span class="arithmatex">\(T\)</span> 的后两位与 <span class="arithmatex">\(S\)</span> 的后两位相同。我们发现，这一点在 KMP 运作的过程中很重要：找出 <span class="arithmatex">\(T\)</span> 的后缀与 <span class="arithmatex">\(S\)</span> 的前缀相同的部分。</p>
+<p>我们来关注一个集合：<span class="arithmatex">\(\mathrm{Right}(T)=\left\{x|T_{|T|-x+1\cdots|T|}=S_{1\cdots x}\right\}\)</span>。通俗的来讲就是 <span class="arithmatex">\(\mathrm{Right}(T)\)</span> 中包含所有的满足 <span class="arithmatex">\(T\)</span> 的后 <span class="arithmatex">\(x\)</span> 位与 <span class="arithmatex">\(S\)</span> 的前 <span class="arithmatex">\(x\)</span> 位相同。</p>
+<details class="example">
+<summary>举个例子</summary>
+<p>若 <span class="arithmatex">\(S=\texttt{ababb},T=\texttt{aabab}\)</span>，</p>
+<p>那么此时 <span class="arithmatex">\(\mathrm{Right}(T)=\left\{0,2,4\right\}\)</span>。</p>
+</details>
+<p>这时，如果再输入一个字符 <span class="arithmatex">\(c\)</span>，<span class="arithmatex">\(\mathrm{Right}(T)\)</span> 会产生怎么样的变化呢？</p>
+<p>我们发现：对于 <span class="arithmatex">\(\mathrm{Right}(T)\)</span> 中的每一个元素 <span class="arithmatex">\(x\)</span>，如果在 <span class="arithmatex">\(S\)</span> 中满足 <span class="arithmatex">\(S_x\)</span> 的后一个也是 <span class="arithmatex">\(c\)</span>，那么<span class="arithmatex">\(\mathrm{Right}(T')\)</span> 就必然包含 <span class="arithmatex">\(x+1\)</span>。用数学语言表达：<span class="arithmatex">\(\mathrm{Right}(T+c)=\left\{x+1|x \in \mathrm{Right(T)}\land x \neq |S| \land S_{x+1}=c\right\} \cup \left\{0\right\}\)</span>。</p>
+<p>这就是 DFA 五个部分中的 <span class="arithmatex">\(\delta\)</span> 转移。</p>
+<div class="admonition warning">
+<p class="admonition-title">注意</p>
+<p>请注意这个转移，我们暂且把它叫做“<span class="arithmatex">\(\mathrm{Right}\)</span> 转移”。</p>
+</div>
+<p>当 <span class="arithmatex">\(|S| \in \mathrm{Right(T)}\)</span> 时，说明 <span class="arithmatex">\(S\)</span> 是 <span class="arithmatex">\(T\)</span> 的后缀，即到达一个可接受状态。</p>
+<p>这时，如果已 <span class="arithmatex">\(\mathrm{Right(T)}\)</span> 作为 DFA 的状态，我们会发现这个 DFA 的状态数多达 <span class="arithmatex">\(2^{|S|}\)</span> 种（<span class="arithmatex">\(\mathrm{Right}(T) \in \left[0,|S|\right]\)</span>），效率不高。</p>
+<div class="admonition tip">
+<p class="admonition-title">状态数真得有这么多吗？</p>
+<p>其实不然。状态数最多只有 <span class="arithmatex">\(|S|+1\)</span> 种。</p>
+<p>简单思考一下，对于同一个串 <span class="arithmatex">\(S\)</span>，<span class="arithmatex">\(\mathrm{Right}\)</span> 集合 <span class="arithmatex">\(\left\{0,1,3\right\}\)</span> 和 <span class="arithmatex">\(\left\{0,2,3\right\}\)</span> 是不可能同时存在的。</p>
+<p>为什么呢？因为 <span class="arithmatex">\(\mathrm{Right}\)</span> 集合种最大的元素 <span class="arithmatex">\(k\)</span> 就可以确定这一集合，也就是说最大的元素是 <span class="arithmatex">\(k\)</span> 的 <span class="arithmatex">\(\mathrm{Right}\)</span> 是唯一的。</p>
+<p>因为知道了 <span class="arithmatex">\(k\)</span>，就确定了 <span class="arithmatex">\(T\)</span> 字符串的后缀是什么（<span class="arithmatex">\(S_{1 \cdots k}\)</span>）。</p>
+<p>也就是说 <span class="arithmatex">\(\mathrm{Right}(T)=\mathrm{Right}(S_{1 \cdots k})\)</span>。这个前缀是唯一的，所以 <span class="arithmatex">\(k\)</span> 所对应的 <span class="arithmatex">\(\mathrm{Right}\)</span> 集合也是唯一的。</p>
+<p>这在下一步中很重要。同时，这样通过寻找<strong>重复</strong>和<strong>不必要</strong>来使复杂度从 <span class="arithmatex">\(\mathcal{O}(a^n)\)</span> 降到 <span class="arithmatex">\(\mathcal{O}(n)\)</span>，在其他算法中也有出现。</p>
+</div>
+<h3 id="fail">fail 指针<a class="headerlink" href="#fail" title="Permanent link">&para;</a></h3>
+<p>虽然可以证明，<span class="arithmatex">\(\mathrm{Right}(T)\)</span> 的并没有达到 <span class="arithmatex">\(2^{|S|}\)</span> 种，但是用一个集合来表示状态实在不太方便。根据上面的证明，我们知道了集合中最大的一个元素 <span class="arithmatex">\(k\)</span> 可以用来准确无误地表示这个集合。<span class="arithmatex">\(k \in [0,|S|]\)</span>，我们用 <span class="arithmatex">\(k\)</span> 来作为 DFA 的状态。</p>
+<p>但是用 <span class="arithmatex">\(k\)</span> 来作为状态会产生一个问题：我们如何通过 <span class="arithmatex">\(k\)</span> 来反推出原集合中的所有数呢？</p>
+<p>我们可以参考链表地存储方式：假设以 <span class="arithmatex">\(k\)</span> 为最大值的集合是 <span class="arithmatex">\(A\)</span>，定义 <span class="arithmatex">\(\mathrm{fail}_k\)</span> 为 <span class="arithmatex">\(A\)</span> 中第二大的元素。这样，我们就可以得出：<span class="arithmatex">\(\mathrm{Right}(T)=\left\{k,\mathrm{fail}_k,\mathrm{fail}_{\mathrm{fail}_k},\cdots,0\right\}\)</span>（严格递减）。</p>
+<p>现在的重点是：我们如何求 <span class="arithmatex">\(\mathrm{fail}_k\)</span>？</p>
+<p>首先，根据定义，<span class="arithmatex">\(\mathrm{fail}_1=0\)</span>。其余的 <span class="arithmatex">\(\mathrm{fail}\)</span> 指针可以递归求解：</p>
+<p>对于 <span class="arithmatex">\(\mathrm{fail_i}\)</span>，根据定义，<span class="arithmatex">\(A=\mathrm{Right}(T)=\mathrm{Right}(S_{1\cdots i})\)</span>，再根据 <span class="arithmatex">\(\mathrm{Right}\)</span> 集合的定义，<span class="arithmatex">\(S_{1 \cdots \mathrm{fail}_i}=S_{i-\mathrm{fail}_i \cdots i}\)</span>。那么我们就是要找 <span class="arithmatex">\(S_{1 \cdots i}\)</span> 中最长的一个不为 <span class="arithmatex">\(S_{1 \cdots i}\)</span> 的同时是前缀与后缀的字符串 <span class="arithmatex">\(C\)</span>，而 <span class="arithmatex">\(\mathrm{fail}_k=|C|\)</span>。</p>
+<p>再根据“<span class="arithmatex">\(\mathrm{Right}\)</span> 转移”，<span class="arithmatex">\(\mathrm{Right}(S_{1 \cdots i})\)</span> 可由 <span class="arithmatex">\(\mathrm{Right}(S_{1 \cdots i-1})\)</span> 推来，而 <span class="arithmatex">\(\mathrm{Right}(S_{1 \cdots i-1})\)</span> 是已知的（因为是递归计算，在计算 <span class="arithmatex">\(\mathrm{fail}_i\)</span> 前已经计算好了 <span class="arithmatex">\(\mathrm{fail}_{1 \cdots i-1}\)</span>），我们只需要通过不断跳 <span class="arithmatex">\(\mathrm{fail}\)</span> 指针的方法遍历 <span class="arithmatex">\(\mathrm{Right}(S_{1 \cdots i-1})\)</span>，然后找到一个满足 <span class="arithmatex">\(S_{x+1}=c=S_i\)</span> 的 <span class="arithmatex">\(x\)</span> 即可。</p>
+<p>注意如果找不到，那么就为 <span class="arithmatex">\(0\)</span>。</p>
+<h3 id="_1">总结 &amp; 代码 &amp; 复杂度分析<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>总之，梳理一下，回到 DFA 的根本：</p>
+<ol>
+<li>
+<p><span class="arithmatex">\(Q=\left\{0,1,\cdots,|S|\right\}\)</span>，经过优化，用 <span class="arithmatex">\(k \in \left\{0,1,\cdots,|S|\right\}\)</span> 作为状态。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(\Sigma\)</span>，应题而异，有时是 <span class="arithmatex">\(26\)</span> 个小写字母，有时是数字或其他。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(q_0=0\)</span>，显然未输入字符时 <span class="arithmatex">\(\mathrm{Right}(\emptyset)=\left\{0\right\}\)</span>。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(F=\left\{|S|\right\}\)</span>，当 <span class="arithmatex">\(T\)</span> 后缀与 <span class="arithmatex">\(S\)</span> 完全匹配时到达符合条件的状态。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(\delta(q,c)=\begin{cases}q+1&amp;S_{q+1}=c\\0&amp;q=0\\\delta(\mathrm{fail}_q,c)&amp;\mathrm{otherwise}\end{cases}\)</span></p>
+</li>
+<li>
+<p><span class="arithmatex">\(\mathrm{fail}_q=\begin{cases}0&amp;q=1\\\delta(\mathrm{fail}_{q-1},S_q)&amp;\mathrm{otherwise}\end{cases}\)</span></p>
+</li>
+</ol>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="匹配时允许-s-重叠" name="__tabbed_1" type="radio" /><input id="匹配时要求-s-不能重叠" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="匹配时允许-s-重叠">匹配时允许 <span class="arithmatex">\(S\)</span> 重叠</label><label for="匹配时要求-s-不能重叠">匹配时要求 <span class="arithmatex">\(S\)</span> 不能重叠</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">ans</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="n">n</span><span class="o">=</span><span class="n">strlen</span><span class="p">(</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">if</span><span class="p">(</span><span class="n">m</span><span class="o">==</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="sc">&#39;#&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="n">m</span><span class="o">=</span><span class="n">strlen</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;=</span><span class="n">m</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">k</span><span class="o">&amp;&amp;</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">k</span><span class="o">=</span><span class="n">fail</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">k</span><span class="o">++</span><span class="p">;</span><span class="w"> </span><span class="n">fail</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">k</span><span class="p">;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">}</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;=</span><span class="n">n</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">k</span><span class="o">&amp;&amp;</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">k</span><span class="o">=</span><span class="n">fail</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">k</span><span class="o">++</span><span class="p">;</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="o">==</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="n">ans</span><span class="o">++</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="n">fail</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">ans</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="n">n</span><span class="o">=</span><span class="n">strlen</span><span class="p">(</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">if</span><span class="p">(</span><span class="n">m</span><span class="o">==</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="sc">&#39;#&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">scanf</span><span class="p">(</span><span class="s">&quot;%s&quot;</span><span class="p">,</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="n">m</span><span class="o">=</span><span class="n">strlen</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;=</span><span class="n">m</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">k</span><span class="o">&amp;&amp;</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">k</span><span class="o">=</span><span class="n">fail</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">k</span><span class="o">++</span><span class="p">;</span><span class="w"> </span><span class="n">fail</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">k</span><span class="p">;</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;=</span><span class="n">n</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">k</span><span class="o">&amp;&amp;</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">k</span><span class="o">=</span><span class="n">fail</span><span class="p">[</span><span class="n">k</span><span class="p">];</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">k</span><span class="o">++</span><span class="p">;</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="o">==</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="n">ans</span><span class="o">++</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="p">}</span>
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>通过程序，我们来稍微分析一下 KMP 的时间复杂度。</p>
+<p>首先，由于每次 <span class="arithmatex">\(k\)</span> 最多增加 <span class="arithmatex">\(1\)</span>，所以整个循环下来，<span class="arithmatex">\(k\)</span> 最多变成 <span class="arithmatex">\(n\)</span>；然而 <span class="arithmatex">\(fail[k]\)</span> 在最坏情况下也会使 <span class="arithmatex">\(k\)</span> 减一，那么整个循环中，<span class="arithmatex">\(k\)</span> 至多增减 <span class="arithmatex">\(2n\)</span> 次，均摊下来时间复杂度为 <span class="arithmatex">\(\mathcal{O}(n+m)\)</span>（包括预处理）。</p>
+<p>对于像笔者这样的菜鸟，完全理解 KMP 要不少时间，但只要多花一些心思，仔细思考一下，KMP 还是比较好理解的。</p>
+<h2 id="kmp-ac">KMP 的进化：AC 自动机<a class="headerlink" href="#kmp-ac" title="Permanent link">&para;</a></h2>
+<h3 id="_2">简单的介绍和对比<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>首先，AC 自动机本名叫做 Aho-Corasick Automaton，而不是 Accepted Automation。所以这个算法<strong>不能</strong>帮助你自动 AC 题目，而是帮助你处理一些字符串问题。</p>
+<p>在上面 KMP 一节中，我们是匹配一个模式串；而 AC 自动机更加强大，可以匹配一堆模式串。其实，简单来说，AC 自动机就是 KMP 与 Trie 树的结合体。</p>
+<p>（不知道 Trie 的请出门右转百度搜索）</p>
+<p>比如我一个字符串 <span class="arithmatex">\(\texttt{abbacbc}\)</span> 想要同时匹配 <span class="arithmatex">\(\texttt{ac,abba,bc}\)</span> 三个字符串，那么该如何做？比如说，求模式串们各出现了几次？</p>
+<p>如果使用传统的 KMP 去做，那么会喜提 <span class="arithmatex">\(\mathcal{O(m^2+nm)}\)</span>，比如说共有 <span class="arithmatex">\(100\)</span> 个模式串，每个模式串长达 <span class="arithmatex">\(100\)</span> 个字符，而匹配串则长达 <span class="arithmatex">\(10^6\)</span> 个字符，那阁下该如何应对？妥妥的超时。</p>
+<p>而 AC 自动机能够做到的是：<span class="arithmatex">\(\mathcal{O(m|S|+n)}\)</span> 的时间复杂度，其中 <span class="arithmatex">\(|S|\)</span> 表示模式串长度。</p>
+<p>比如上面的例子，我们对 <span class="arithmatex">\(\texttt{ac,abba,bc}\)</span> 构造 Trie 树：</p>
+<p><img alt="" src="../images/AC-Trie.png" /></p>
+<h3 id="kmp">数学建模，套用 KMP 的思想<a class="headerlink" href="#kmp" title="Permanent link">&para;</a></h3>
+<p>接下来，我们把匹配串放到这棵 Trie 树上跑，跑到红色节点时，相当于进入了一个理想的状态：某个模式串是当前字符串的后缀。此时，这棵 Trie 树就相当于一个 DFA（当然是不完整的）：</p>
+<ol>
+<li>
+<p><span class="arithmatex">\(Q=\left\{root,a_0,a_1,a_2,\cdots\right\}\)</span>，表示 Trie 树里有哪些节点。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(\Sigma=\left\{\texttt{a,b,c,...,z}\right\}\)</span>，字符集不多解释。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(q_0=root\)</span>，一开始为空串，在根节点处。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(F=\left\{\cdots\right\}\)</span>，表示所有红色节点（结束节点）。</p>
+</li>
+<li>
+<p><span class="arithmatex">\(\delta(q,c)=q'+1\)</span>，表示从 <span class="arithmatex">\(root\)</span> 到 <span class="arithmatex">\(q'\)</span> 构成的串是自动机上当前字符串能够找到的最长后缀且 <span class="arithmatex">\(q'\)</span> 具有 <span class="arithmatex">\(c\)</span> 儿子。</p>
+</li>
+</ol>
+<p>我们仿照上面 KMP 的做法，也设计一个 <span class="arithmatex">\(fail\)</span> 来加速 <span class="arithmatex">\(\delta\)</span> 转移。</p>
+<p><span class="arithmatex">\(\delta(q,c)=\begin{cases}q'&amp;q\;\mathrm{has\;son\;}c\;q'\\root&amp;q=root\\\delta(fail[q],c)&amp;\mathrm{otherwise}\end{cases}\)</span></p>
+<p>（其中 <span class="arithmatex">\(q \mathrm{\;has\;son\;}c\;q'\)</span> 表示 <span class="arithmatex">\(q\)</span> 有 <span class="arithmatex">\(c\)</span> 儿子 <span class="arithmatex">\(q'\)</span>）</p>
+<p><span class="arithmatex">\(fail[i]=\begin{cases}0&amp;i=root\\\delta(fail[fa[i]],c)&amp;i\neq root\end{cases}\)</span></p>
+<p>（其中 <span class="arithmatex">\(fa[i]\)</span> 表示 <span class="arithmatex">\(i\)</span> 节点的父亲，<span class="arithmatex">\(c\)</span> 表示 <span class="arithmatex">\(i\)</span> 节点所对应的字符）</p>
+<p>如果觉得不好理解，可以看一看例子中补全的 DFA：</p>
+<p><img alt="" src="../images/AC%20Automaton.png" /></p>
+<h3 id="_3">代码 &amp; 复杂度分析<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>基本代码：</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">MAXN</span><span class="o">=</span><span class="mi">1000005</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">struct</span><span class="w"> </span><span class="nc">ACNode</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">son</span><span class="p">[</span><span class="mi">26</span><span class="p">],</span><span class="n">fail</span><span class="p">;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">flag</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">ACNode</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="n">flag</span><span class="o">=</span><span class="n">fail</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">26</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">;</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">};</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="n">ACNode</span><span class="w"> </span><span class="n">ac</span><span class="p">[</span><span class="n">MAXN</span><span class="p">];</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="kt">int</span><span class="w"> </span><span class="n">cnt</span><span class="p">;</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="kt">void</span><span class="w"> </span><span class="nf">InsertString</span><span class="p">(</span><span class="n">string</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">now</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">ac</span><span class="p">[</span><span class="n">now</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="sc">&#39;a&#39;</span><span class="p">])</span><span class="w"> </span><span class="n">ac</span><span class="p">[</span><span class="n">now</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="sc">&#39;a&#39;</span><span class="p">]</span><span class="o">=++</span><span class="n">cnt</span><span class="p">;</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">        </span><span class="n">now</span><span class="o">=</span><span class="n">ac</span><span class="p">[</span><span class="n">now</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="sc">&#39;a&#39;</span><span class="p">];</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="n">ac</span><span class="p">[</span><span class="n">now</span><span class="p">].</span><span class="n">flag</span><span class="o">=</span><span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">;</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="p">}</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="kt">void</span><span class="w"> </span><span class="nf">BuildAC</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="n">queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">que</span><span class="p">;</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">26</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">ac</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="n">que</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">ac</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">que</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">u</span><span class="o">=</span><span class="n">que</span><span class="p">.</span><span class="n">front</span><span class="p">();</span><span class="w"> </span><span class="n">que</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">26</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">ac</span><span class="p">[</span><span class="n">u</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">                </span><span class="n">ac</span><span class="p">[</span><span class="n">u</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">ac</span><span class="p">[</span><span class="n">ac</span><span class="p">[</span><span class="n">u</span><span class="p">].</span><span class="n">fail</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">                </span><span class="k">continue</span><span class="w"> </span><span class="p">;</span>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="w">            </span><span class="n">que</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">ac</span><span class="p">[</span><span class="n">u</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span><span id="__span-2-34"><a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="w">            </span><span class="n">ac</span><span class="p">[</span><span class="n">ac</span><span class="p">[</span><span class="n">u</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">]].</span><span class="n">fail</span><span class="o">=</span><span class="n">ac</span><span class="p">[</span><span class="n">ac</span><span class="p">[</span><span class="n">u</span><span class="p">].</span><span class="n">fail</span><span class="p">].</span><span class="n">son</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span id="__span-2-35"><a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-2-36"><a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-37"><a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">;</span>
+</span><span id="__span-2-38"><a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>（2024/2/8：发现代码漏洞百出，重构了一遍）</p>
+<p>在遇到不同的题目时，可以适当地利用 AC 机的结构来方便快捷地解题，将 AC 自动机与树形 DP、拓扑排序等算法联系起来。</p>
+<p>这个算法继承了 Trie 并不算好的空间复杂度。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2023 - 2024 3Zinc
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/3Zinc" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:3zinc@tinkmail.me" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4l217.6 163.2c11.4 8.5 27 8.5 38.4 0l217.6-163.2c12.1-9.1 19.2-23.3 19.2-38.4 0-26.5-21.5-48-48-48H48zM0 176v208c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64V176L294.4 339.2a63.9 63.9 0 0 1-76.8 0L0 176z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top", "navigation.instant", "toc.follow", "search.suggest", "content.code.copy", "content.tooltips", "content.tabs.link", "pymdownx.superfences", {"alternate_style": true, "pymdownx.tabbed": null}], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8d2eff1.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="../es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

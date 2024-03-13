@@ -8,13 +8,9 @@
       
       
       
-        <link rel="canonical" href="https://3zinc.github.io/notes/%E9%80%86%E5%85%83/">
+        <link rel="canonical" href="https://3zinc.github.io/notes/%E6%A6%82%E7%8E%87/">
       
       
-        <link rel="prev" href="../%E5%9F%BA%E6%9C%AC%E4%B8%8D%E7%AD%89%E5%BC%8F/">
-      
-      
-        <link rel="next" href="../%E9%9B%86%E5%90%88/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -22,7 +18,7 @@
     
     
       
-        <title>逆元 - Notes :: 3Zinc</title>
+        <title>概率 - Notes :: 3Zinc</title>
       
     
     
@@ -69,11 +65,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#_1" class="md-skip">
-          跳转至
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -104,7 +95,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              逆元
+              概率
             
           </span>
         </div>
@@ -235,12 +226,10 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../%E5%9F%BA%E6%9C%AC%E4%B8%8D%E7%AD%89%E5%BC%8F/" class="md-tabs__link">
           
   
@@ -439,28 +428,23 @@
       
   
   
-    
   
   
-  
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -471,7 +455,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             数学
@@ -503,8 +487,6 @@
                 
   
   
-    
-  
   
   
     
@@ -514,11 +496,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
           <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
@@ -532,7 +514,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             初等数论
@@ -543,19 +525,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../%E9%80%86%E5%85%83/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -564,7 +537,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -731,8 +703,6 @@
   
   
   
-    
-  
   
 </nav>
                   </div>
@@ -747,10 +717,23 @@
                   
 
 
-<h1 id="_1">费马小定理<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p><span class="arithmatex">\(a \equiv a^p \bmod p\)</span></p>
-<p><span class="arithmatex">\(a^{-1}\equiv a^{p-1} \bmod p\)</span></p>
-<p>（p 为质数）</p>
+  <h1>概率</h1>
+
+<p>古典概率：元素有限、每个元素概率相等</p>
+<p><span class="arithmatex">\(P(A)\)</span>：<span class="arithmatex">\(A\)</span> 事件发生的概率。</p>
+<p>对于互相排斥的事件：</p>
+<p><span class="arithmatex">\(P(A_1 \cup A_2 \cup \cdots \cup A_n)=P(A_1)+P(A_2)+\cdots+P(A_n)\)</span></p>
+<p><span class="arithmatex">\(P(A_1 \cap A_2 \cap \cdots \cap A_n)=P(A_1) \cdot P(A_2) \cdot \cdots \cdot P(A_n)\)</span></p>
+<p>对于任意事件</p>
+<p><span class="arithmatex">\(P(A_1 \cup A_2 \cup \cdots \cup A_n)=\sum{P(A_i)}-\sum{P(A_i \cap A_j)}\cdots + (-1)^{n-1}\sum{P(A_1 \cap A_2 \cap \cdots \cap A_n)}\)</span></p>
+<p><span class="arithmatex">\(P(B|A)\)</span> 表示在 <span class="arithmatex">\(A\)</span> 发生的概率下发生 <span class="arithmatex">\(B\)</span>。</p>
+<p><span class="arithmatex">\(P(B|A)=\dfrac{P(AB)}{P(A)}\)</span></p>
+<p>对于任意事件 <span class="arithmatex">\(A,B\)</span>：<span class="arithmatex">\(P(AB)=P(A) \cdot P(B)\)</span></p>
+<p>对于任意事件：<span class="arithmatex">\(P(A_1A_2\cdots A_n)=P(A_1)\cdot P(A_2|A_1)\cdot P(A_3|A_1A_2) \cdots P(A_n|A_1A_2\cdots A_{n-1})\)</span></p>
+<p>期望：<span class="arithmatex">\(E(X)=\sum_xP(X=x) \cdot x\)</span></p>
+<p><span class="arithmatex">\(E(aX+bY)=aE(X)+bE(Y)\)</span>（<span class="arithmatex">\(a,b\)</span> 为任意实数）</p>
+<p>若 <span class="arithmatex">\(X,Y\)</span> 是两个独立的随机变量：<span class="arithmatex">\(E(XY)=E(X)E(Y)\)</span></p>
+<p>随机事件的方差：<span class="arithmatex">\(D(X)=E((X-E(X))^2)=E(X^2)-E^2(X)\)</span></p>
 
 
 
